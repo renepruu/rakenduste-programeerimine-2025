@@ -1,4 +1,5 @@
 import React from "react"
+import "./ProfileCard.css"
 
 const ProfileCard: React.FC = () => {
   return (
