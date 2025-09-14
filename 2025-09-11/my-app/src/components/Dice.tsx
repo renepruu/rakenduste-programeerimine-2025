@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 
 function Dice() {
   const [dice, setDice] = useState<number>(1)
