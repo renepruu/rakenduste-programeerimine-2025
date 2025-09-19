@@ -1,6 +1,7 @@
 import Appbar from "../components/Appbar"
 import ExtraInfo from "../components/ExtraInfo"
 import FormContent from "../components/Form"
+import LocalStorage from "../components/LocalStorage"
 
 function Home() {
   return (
@@ -8,6 +9,7 @@ function Home() {
       <Appbar />
       <FormContent />
       <ExtraInfo />
+      <LocalStorage />
     </>
   )
 }
