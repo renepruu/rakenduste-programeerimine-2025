@@ -1,9 +1,8 @@
-import Navbar from "../components/Navbar.tsx"
-
+import AppBar from "../components/Appbar"
 function About() {
   return (
     <>
-      <Navbar />
+      <AppBar />
       <h1>About</h1>
     </>
   )

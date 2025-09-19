@@ -1,20 +1,13 @@
-import Navbar from "../components/Navbar"
-import Button from "@mui/material/Button"
+import Appbar from "../components/Appbar"
+import ExtraInfo from "../components/ExtraInfo"
+import FormContent from "../components/Form"
 
 function Home() {
   return (
     <>
-      <Navbar />
-      <h1>Rene Pruul</h1>
-
-      <div>
-        <Button
-          variant="outlined"
-          size="large"
-        >
-          MUI nupp, outlined + large
-        </Button>
-      </div>
+      <Appbar />
+      <FormContent />
+      <ExtraInfo />
     </>
   )
 }
