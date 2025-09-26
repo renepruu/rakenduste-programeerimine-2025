@@ -1,17 +1,17 @@
 const express = require("express")
 const router = express.Router()
-const catsController = require("../controllers/cats.controller")
+const todosController = require("../controllers/todos.controller")
 const { body, validationResult } = require("express-validator")
 
 const {
-  catsRouteMiddleware,
-  catsGetRouteMiddleware,
-} = require("../middlewares/cats.middlewares")
+  todosRouteMiddleware,
+  todosGetRouteMiddleware,
+} = require("../middlewares/todos.middlewares")
 
-router.use(catsRouteMiddleware)
+router.use(todosRouteMiddleware)
 
 // /cats/ Get endpoint level middleware
-router.get("/", catsGetRouteMiddleware, catsController.read)
+router.get("/", todosGetRouteMiddleware, todosController.read)
 router.post(
   "/",
   body("name").trim().notEmpty().withMessage("Name is required"),
@@ -21,7 +21,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() })
     next()
   },
-  catsController.create,
+  todosController.create,
 )
 router.put(
   "/",
@@ -33,8 +33,8 @@ router.put(
       return res.status(400).json({ errors: errors.array() })
     next()
   },
-  catsController.update,
+  todosController.update,
 )
-router.delete("/", catsController.delete)
+router.delete("/", todosController.delete)
 
 module.exports = router

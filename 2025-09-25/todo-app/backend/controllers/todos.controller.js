@@ -3,17 +3,17 @@ const crypto = require("crypto")
 function generateId() {
   return crypto.randomUUID()
 }
-const cats = [
+const todos = [
   {
     id: "7d613b93-fa3e-4ef3-a9d2-e09e5ca6e4e6",
-    name: "Meow",
+    name: "Homework",
     createdAt: 1727098800585,
     updatedAt: null,
     deleted: false,
   },
   {
     id: "2dc9ce08-d345-4fed-8560-4c6b66fb0836",
-    name: "Kitty",
+    name: "Shopping",
     createdAt: 1727098952739,
     updatedAt: null,
     deleted: false,
@@ -26,7 +26,7 @@ exports.create = (req, res) => {
     return res.status(400)
   }
 
-  const newCat = {
+  const newTodo = {
     id: generateId(),
     name,
     createdAt: Date.now(),
@@ -34,41 +34,41 @@ exports.create = (req, res) => {
     deleted: false,
   }
 
-  cats.push(newCat)
-  res.status(201).json(newCat)
+  todos.push(newTodo)
+  res.status(201).json(newTodo)
 }
 
 exports.read = (req, res) => {
-  res.send(cats.filter(c => !c.deleted))
+  res.send(todos.filter(t => !t.deleted))
 }
 
 exports.update = (req, res) => {
   const { id } = req.params
   const { name } = req.body
 
-  const cat = cats.find(c => c.id === id && !c.deleted)
+  const todo = todos.find(t => t.id === id && !t.deleted)
 
-  if (!cat) {
-    return res.status(404).json({ error: "Cat not found" })
+  if (!todo) {
+    return res.status(404).json({ error: "TODO not found" })
   }
 
-  cat.name = name || cat.name
-  cat.updatedAt = Date.now()
+  todo.name = name || todo.name
+  todo.updatedAt = Date.now()
 
-  res.json(cat)
+  res.json(todo)
 }
 
 exports.delete = (req, res) => {
   const { id } = req.params
 
-  const cat = cats.find(c => c.id === id && !c.deleted)
+  const todo = todos.find(t => t.id === id && !t.deleted)
 
-  if (!cat) {
-    return res.status(404).json({ error: "Cat not found" })
+  if (!todo) {
+    return res.status(404).json({ error: "TODO not found" })
   }
 
-  cat.deleted = true
-  cat.updatedAt = Date.now()
+  todo.deleted = true
+  todo.updatedAt = Date.now()
 
-  res.json({ message: "Cat deleted", cat })
+  res.json({ message: "TODO deleted", todo })
 }
