@@ -24,8 +24,7 @@ router.post(
   todosController.create,
 )
 router.put(
-  "/",
-  body("id").trim().notEmpty().withMessage("ID is required"),
+  "/:id",
   body("name").trim().notEmpty().withMessage("Name is required"),
   (req, res, next) => {
     const errors = validationResult(req)
@@ -35,6 +34,9 @@ router.put(
   },
   todosController.update,
 )
-router.delete("/", todosController.delete)
+router.delete("/:id", todosController.delete)
+
+router.get("/admin", todosController.readAll)
+router.patch("/admin/toggle/:id", todosController.toggleDeleted)
 
 module.exports = router

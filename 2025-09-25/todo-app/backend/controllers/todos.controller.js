@@ -46,16 +46,16 @@ exports.update = (req, res) => {
   const { id } = req.params
   const { name } = req.body
 
-  const todo = todos.find(t => t.id === id && !t.deleted)
+  const todoItem = todos.find(t => t.id === id && !t.deleted)
 
-  if (!todo) {
+  if (!todoItem) {
     return res.status(404).json({ error: "TODO not found" })
   }
 
-  todo.name = name || todo.name
-  todo.updatedAt = Date.now()
+  todoItem.name = name || todoItem.name
+  todoItem.updatedAt = Date.now()
 
-  res.json(todo)
+  res.json(todoItem)
 }
 
 exports.delete = (req, res) => {
@@ -71,4 +71,17 @@ exports.delete = (req, res) => {
   todo.updatedAt = Date.now()
 
   res.json({ message: "TODO deleted", todo })
+}
+exports.readAll = (req, res) => {
+  res.json(todos)
+}
+exports.toggleDeleted = (req, res) => {
+  const { id } = req.params
+  const todoItem = todos.find(t => t.id === id)
+  if (!todoItem) return res.status(404).json({ error: "TODO not found" })
+
+  todoItem.deleted = !todoItem.deleted
+  todoItem.updatedAt = Date.now()
+
+  res.json({ message: "Todo toggled", todo: todoItem })
 }
