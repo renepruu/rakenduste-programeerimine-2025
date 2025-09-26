@@ -1,8 +1,9 @@
-import Cats from "./components/Cats"
+import AdminPanel from "./components/AdminPanel"
+
 function App() {
   return (
     <div className="App">
-      <Cats />
+      <AdminPanel />
     </div>
   )
 }
