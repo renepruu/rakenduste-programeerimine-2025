@@ -1,3 +1,8 @@
+const crypto = require("crypto")
+
+function generateId() {
+  return crypto.randomUUID()
+}
 const cats = [
   {
     id: "7d613b93-fa3e-4ef3-a9d2-e09e5ca6e4e6",
@@ -22,7 +27,7 @@ exports.create = (req, res) => {
   }
 
   const newCat = {
-    id: uuidv4(),
+    id: generateId(),
     name,
     createdAt: Date.now(),
     updatedAt: null,
