@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express()
 const port = 3000
-const catsRoutes = require("./routes/cats.routes")
+const todoRoutes = require("./routes/todo.routes")
 cors = require("cors")
 
 app.use(cors())
@@ -15,4 +15,4 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
-app.use("/cats", catsRoutes)
+app.use("/todo", todoRoutes)

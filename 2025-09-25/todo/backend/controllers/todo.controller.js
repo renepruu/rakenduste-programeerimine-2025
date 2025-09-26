@@ -1,24 +1,3 @@
-const crypto = require("crypto")
-
-function generateId() {
-  return crypto.randomUUID()
-}
-const todo = [
-  {
-    id: "7d613b93-fa3e-4ef3-a9d2-e09e5ca6e4e6",
-    name: "Meow",
-    createdAt: 1727098800585,
-    updatedAt: null,
-    deleted: false,
-  },
-  {
-    id: "2dc9ce08-d345-4fed-8560-4c6b66fb0836",
-    name: "Kitty",
-    createdAt: 1727098952739,
-    updatedAt: null,
-    deleted: false,
-  },
-]
 exports.create = (req, res) => {
   const { name } = req.body
 
@@ -26,7 +5,7 @@ exports.create = (req, res) => {
     return res.status(400)
   }
 
-  const newCat = {
+  const newTodo = {
     id: generateId(),
     name,
     createdAt: Date.now(),
@@ -34,8 +13,8 @@ exports.create = (req, res) => {
     deleted: false,
   }
 
-  todo.push(newCat)
-  res.status(201).json(newCat)
+  todo.push(newTodo)
+  res.status(201).json(newTodo)
 }
 
 exports.read = (req, res) => {
@@ -46,29 +25,29 @@ exports.update = (req, res) => {
   const { id } = req.params
   const { name } = req.body
 
-  const cat = todo.find(c => c.id === id && !c.deleted)
+  const todo = todo.find(c => c.id === id && !c.deleted)
 
-  if (!cat) {
-    return res.status(404).json({ error: "Cat not found" })
+  if (!todo) {
+    return res.status(404).json({ error: "todo not found" })
   }
 
-  cat.name = name || cat.name
-  cat.updatedAt = Date.now()
+  todo.name = name || todo.name
+  todo.updatedAt = Date.now()
 
-  res.json(cat)
+  res.json(todo)
 }
 
 exports.delete = (req, res) => {
   const { id } = req.params
 
-  const cat = todo.find(c => c.id === id && !c.deleted)
+  const todo = todo.find(c => c.id === id && !c.deleted)
 
-  if (!cat) {
-    return res.status(404).json({ error: "Cat not found" })
+  if (!todo) {
+    return res.status(404).json({ error: "todo not found" })
   }
 
-  cat.deleted = true
-  cat.updatedAt = Date.now()
+  todo.deleted = true
+  todo.updatedAt = Date.now()
 
-  res.json({ message: "Cat deleted", cat })
+  res.json({ message: "todo deleted", todo })
 }
