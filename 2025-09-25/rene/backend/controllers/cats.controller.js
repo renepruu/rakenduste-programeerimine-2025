@@ -13,20 +13,57 @@ const cats = [
     updatedAt: null,
     deleted: false,
   },
-];
+]
 exports.create = (req, res) => {
+  const { name } = req.body
 
-    const { name } = req.body;
+  if (!name) {
+    return res.status(400)
+  }
 
-    console.log(req.body);
-    res.sendStatus(200);
-};
+  const newCat = {
+    id: uuidv4(),
+    name,
+    createdAt: Date.now(),
+    updatedAt: null,
+    deleted: false,
+  }
+
+  cats.push(newCat)
+  res.status(201).json(newCat)
+}
 
 exports.read = (req, res) => {
-    res.send(cats);
-};
+  res.send(cats.filter(c => !c.deleted))
+}
 
+exports.update = (req, res) => {
+  const { id } = req.params
+  const { name } = req.body
 
-exports.update = (req, res) => {};
+  const cat = cats.find(c => c.id === id && !c.deleted)
 
-exports.delete = (req, res) => {};
+  if (!cat) {
+    return res.status(404).json({ error: "Cat not found" })
+  }
+
+  cat.name = name || cat.name
+  cat.updatedAt = Date.now()
+
+  res.json(cat)
+}
+
+exports.delete = (req, res) => {
+  const { id } = req.params
+
+  const cat = cats.find(c => c.id === id && !c.deleted)
+
+  if (!cat) {
+    return res.status(404).json({ error: "Cat not found" })
+  }
+
+  cat.deleted = true
+  cat.updatedAt = Date.now()
+
+  res.json({ message: "Cat deleted", cat })
+}

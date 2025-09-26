@@ -1,12 +1,12 @@
-import { Box, Button, Stack, TextField } from "@mui/material";
-import React, { useState } from "react";
+import { Box, Button, Stack, TextField } from "@mui/material"
+import React, { useState } from "react"
 
 type SubmitCatProps = {
-  fetchCats: () => void;
-};
+  fetchCats: () => void
+}
 
 const SubmitCat = ({ fetchCats }: SubmitCatProps) => {
-  const [name, setName] = useState("");
+  const [name, setName] = useState("")
 
   const submitCat = async () => {
     try {
@@ -17,26 +17,26 @@ const SubmitCat = ({ fetchCats }: SubmitCatProps) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: name }),
-      });
+      })
 
       if (response.ok) {
-        console.log("Success", response);
+        console.log("Success", response)
         // Snackbar success
       } else {
-        console.warn("No success");
+        console.warn("No success")
         // Snackbar
       }
     } catch (error) {
-      console.warn(error);
+      console.warn(error)
     }
-  };
+  }
 
   const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    submitCat();
-    setTimeout(fetchCats, 100);
-  };
+    submitCat()
+    setTimeout(fetchCats, 100)
+  }
 
   return (
     <Box
@@ -46,15 +46,19 @@ const SubmitCat = ({ fetchCats }: SubmitCatProps) => {
         <Stack>
           <TextField
             label="Cat name"
-            onChange={(event) => setName(event.target.value)}
+            onChange={event => setName(event.target.value)}
           />
-          <Button variant="contained" color="success" type="submit">
+          <Button
+            variant="contained"
+            color="success"
+            type="submit"
+          >
             Add
           </Button>
         </Stack>
       </form>
     </Box>
-  );
-};
+  )
+}
 
-export default SubmitCat;
+export default SubmitCat
