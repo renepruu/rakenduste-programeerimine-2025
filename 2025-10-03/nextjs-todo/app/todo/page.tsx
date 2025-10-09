@@ -12,11 +12,13 @@ export default function TodoPage() {
   const supabase = createClient();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTitle, setNewTitle] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  //
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
 
   // READ
   const fetchTodos = async () => {
-    setLoading(true);
     const { data, error } = await supabase
       .from("todo")
       .select("*")
@@ -24,7 +26,6 @@ export default function TodoPage() {
 
     if (error) console.error("Error fetching todos:", error.message);
     else setTodos(data ?? []);
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -51,6 +52,21 @@ export default function TodoPage() {
     else setTodos(todos.filter((t) => t.id !== id));
   };
 
+  // UPDATE
+  const updateTodo = async (id: number) => {
+    if (!editTitle.trim()) return;
+
+    const { error } = await supabase
+      .from("todo")
+      .update({ title: editTitle })
+      // .eq - > equals
+      .eq("id", id);
+
+    setTodos(todos.map((t) => (t.id === id ? { ...t, title: editTitle } : t)));
+    setEditingId(null);
+    setEditTitle("");
+  };
+
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6 text-center text-indigo-600">
@@ -73,28 +89,54 @@ export default function TodoPage() {
         </button>
       </form>
 
-      {loading ? (
-        <p className="text-gray-500 text-center">Loading...</p>
-      ) : todos.length === 0 ? (
-        <p className="text-gray-500 text-center">No todos yet.</p>
-      ) : (
+      {
         <ul className="space-y-3">
           {todos.map((todo) => (
             <li
               key={todo.id}
               className="p-4 bg-white border rounded-md shadow-sm flex justify-between items-center"
             >
-              <span className="text-gray-800">{todo.title}</span>
-              <button
-                onClick={() => deleteTodo(todo.id)}
-                className="text-sm text-red-600 hover:underline"
-              >
-                Delete
-              </button>
+              {editingId === todo.id ? (
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                />
+              ) : (
+                <span>{todo.title}</span>
+              )}
+
+              <div className="flex gap-2">
+                {editingId === todo.id ? (
+                  <>
+                    <button onClick={() => updateTodo(todo.id)}>Save</button>
+                    <button
+                      onClick={() => {
+                        setEditingId(null);
+                        setEditTitle("");
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        setEditingId(todo.id);
+                        setEditTitle(todo.title);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+                  </>
+                )}
+              </div>
             </li>
           ))}
         </ul>
-      )}
+      }
     </div>
   );
 }
