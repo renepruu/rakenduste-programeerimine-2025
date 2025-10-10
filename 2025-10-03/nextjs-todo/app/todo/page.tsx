@@ -1,71 +1,48 @@
-"use client";
+// app/todo/page.tsx
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+import TodoList from "./TodoList";
 
-import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
+console.log("Running on the server at:", new Date().toISOString());
 
-type Todo = {
-  id: number;
-  title: string;
-};
+// ✅ SERVER ACTIONS (run on the server)
+export async function addTodo(formData: FormData) {
+  "use server";
 
-export default function TodoPage() {
-  const supabase = createClient();
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [newTitle, setNewTitle] = useState("");
+  const supabase = await createClient();
+  const title = formData.get("title") as string;
 
-  //
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editTitle, setEditTitle] = useState("");
+  if (!title?.trim()) return;
+  await supabase.from("todo").insert({ title });
+  revalidatePath("/todo"); // refresh data after adding
+}
 
-  // READ
-  const fetchTodos = async () => {
-    const { data, error } = await supabase
-      .from("todo")
-      .select("*")
-      .order("id", { ascending: false });
+export async function updateTodo(id: number, title: string) {
+  "use server";
 
-    if (error) console.error("Error fetching todos:", error.message);
-    else setTodos(data ?? []);
-  };
+  const supabase = await createClient();
+  await supabase.from("todo").update({ title }).eq("id", id);
+  revalidatePath("/todo");
+}
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
+export async function deleteTodo(id: number) {
+  "use server";
 
-  // CREATE
-  const addTodo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
+  const supabase = await createClient();
+  await supabase.from("todo").delete().eq("id", id);
+  revalidatePath("/todo");
+}
 
-    const { error } = await supabase.from("todo").insert({ title: newTitle });
-    if (error) alert(error.message);
-    else {
-      setNewTitle("");
-      fetchTodos();
-    }
-  };
+// ✅ PAGE COMPONENT (fetches todos server-side)
+export default async function TodoPage() {
+  const supabase = await createClient();
 
-  // DELETE
-  const deleteTodo = async (id: number) => {
-    const { error } = await supabase.from("todo").delete().eq("id", id);
-    if (error) alert(error.message);
-    else setTodos(todos.filter((t) => t.id !== id));
-  };
+  const { data: todos, error } = await supabase
+    .from("todo")
+    .select("*")
+    .order("id", { ascending: false });
 
-  // UPDATE
-  const updateTodo = async (id: number) => {
-    if (!editTitle.trim()) return;
-
-    const { error } = await supabase
-      .from("todo")
-      .update({ title: editTitle })
-      // .eq - > equals
-      .eq("id", id);
-
-    setTodos(todos.map((t) => (t.id === id ? { ...t, title: editTitle } : t)));
-    setEditingId(null);
-    setEditTitle("");
-  };
+  if (error) console.error(error);
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -73,70 +50,12 @@ export default function TodoPage() {
         Todo List
       </h1>
 
-      <form onSubmit={addTodo} className="mb-6 flex gap-2">
-        <input
-          type="text"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Add a new todo..."
-          className="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
-        />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-        >
-          Add
-        </button>
-      </form>
-
-      {
-        <ul className="space-y-3">
-          {todos.map((todo) => (
-            <li
-              key={todo.id}
-              className="p-4 bg-white border rounded-md shadow-sm flex justify-between items-center"
-            >
-              {editingId === todo.id ? (
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                />
-              ) : (
-                <span>{todo.title}</span>
-              )}
-
-              <div className="flex gap-2">
-                {editingId === todo.id ? (
-                  <>
-                    <button onClick={() => updateTodo(todo.id)}>Save</button>
-                    <button
-                      onClick={() => {
-                        setEditingId(null);
-                        setEditTitle("");
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => {
-                        setEditingId(todo.id);
-                        setEditTitle(todo.title);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button onClick={() => deleteTodo(todo.id)}>Delete</button>
-                  </>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      }
+      <TodoList
+        todos={todos ?? []}
+        addTodo={addTodo}
+        updateTodo={updateTodo}
+        deleteTodo={deleteTodo}
+      />
     </div>
   );
 }
