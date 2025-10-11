@@ -1,37 +1,34 @@
 // app/notes/page.tsx
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/client";
+import { createAdminClient } from "@/lib/supabase/ServerAdmin";
 import { revalidatePath } from "next/cache";
 import NotesList from "./NotesList";
 
 export async function addNote(formData: FormData) {
   "use server";
-
-  const supabase = await createClient();
+  const supabase = createAdminClient(); // service key client
   const title = formData.get("title") as string;
   if (!title?.trim()) return;
-
   await supabase.from("notes").insert({ title });
   revalidatePath("/notes");
 }
 
 export async function updateNote(id: number, title: string) {
   "use server";
-
-  const supabase = await createClient();
+  const supabase = createAdminClient(); // service key client
   await supabase.from("notes").update({ title }).eq("id", id);
   revalidatePath("/notes");
 }
 
 export async function deleteNote(id: number) {
   "use server";
-
-  const supabase = await createClient();
+  const supabase = createAdminClient(); // service key client
   await supabase.from("notes").delete().eq("id", id);
   revalidatePath("/notes");
 }
 
 export default async function NotesPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient(); // anon client (for safe reads)
   const { data: notes, error } = await supabase
     .from("notes")
     .select("*")
