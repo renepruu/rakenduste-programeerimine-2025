@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import "./globals.css";
+import "@mantine/core/styles.css"; // required global styles for Mantine
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -26,6 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      {/* Mantine color scheme script — must be inside <html> */}
+      <head>
+        <ColorSchemeScript />
+      </head>
+
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -33,7 +40,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <MantineProvider
+            defaultColorScheme="light"
+            theme={{
+              primaryColor: "indigo",
+              defaultRadius: "md",
+            }}
+          >
+            {children}
+          </MantineProvider>
         </ThemeProvider>
       </body>
     </html>
